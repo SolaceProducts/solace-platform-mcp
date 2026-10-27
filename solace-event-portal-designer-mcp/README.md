@@ -136,6 +136,7 @@ This server provides a comprehensive set of tools for full CRUD operations on So
 - **Applications** - Manage applications and their versions
 - **Events** - Manage events and their versions
 - **Schemas** - Manage schemas and their versions
+- **Enumerations** - Manage enums and their versions
 - **AsyncAPI Export** - Generate AsyncAPI specifications from application versions
 
 ### Example Usage

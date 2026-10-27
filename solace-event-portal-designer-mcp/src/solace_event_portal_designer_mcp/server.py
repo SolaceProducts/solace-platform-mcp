@@ -16,6 +16,25 @@ import sys
 
 logger = logging.getLogger(__name__)
 
+# Matches an optional single path parameter segment regardless of its name, e.g. "/{id}" or "/{versionId}".
+# The spec is not consistent about parameter names (e.g. GET /schemaVersions/{versionId} vs PATCH /schemaVersions/{id}).
+_ID = r"(/\{[^/}]+\})?"
+
+# Only the routes matched here are exposed as tools; everything else in the spec is excluded.
+ROUTE_MAPS = [
+    RouteMap(pattern=rf"^/api/v2/architecture/applicationDomains{_ID}$", mcp_type=MCPType.TOOL),
+    RouteMap(pattern=rf"^/api/v2/architecture/applications{_ID}$", mcp_type=MCPType.TOOL),
+    RouteMap(pattern=rf"^/api/v2/architecture/applicationVersions{_ID}$", mcp_type=MCPType.TOOL),
+    RouteMap(pattern=r"^/api/v2/architecture/applicationVersions/\{applicationVersionId\}/asyncApi$", mcp_type=MCPType.TOOL),
+    RouteMap(pattern=rf"^/api/v2/architecture/events{_ID}$", mcp_type=MCPType.TOOL),
+    RouteMap(pattern=rf"^/api/v2/architecture/eventVersions{_ID}$", mcp_type=MCPType.TOOL),
+    RouteMap(pattern=rf"^/api/v2/architecture/schemas{_ID}$", mcp_type=MCPType.TOOL),
+    RouteMap(pattern=rf"^/api/v2/architecture/schemaVersions{_ID}$", mcp_type=MCPType.TOOL),
+    RouteMap(pattern=rf"^/api/v2/architecture/enums{_ID}$", mcp_type=MCPType.TOOL),
+    RouteMap(pattern=rf"^/api/v2/architecture/enumVersions{_ID}$", mcp_type=MCPType.TOOL),
+    RouteMap(mcp_type=MCPType.EXCLUDE)
+]
+
 # We need to customize the description of each component. We want to remove all information after the "Token Permissions" link.
 def customize_components(
     route: HTTPRoute, 
@@ -104,17 +123,7 @@ def main():
         openapi_spec=openapi_spec,
         client=client,
         name="EP Designer API",
-        route_maps=[
-            RouteMap(pattern=r"^/api/v2/architecture/applicationDomains(/\{id\})?$", mcp_type=MCPType.TOOL),
-            RouteMap(pattern=r"^/api/v2/architecture/applications(/\{id\})?$", mcp_type=MCPType.TOOL),
-            RouteMap(pattern=r"^/api/v2/architecture/applicationVersions(/\{versionId\})?$", mcp_type=MCPType.TOOL),
-            RouteMap(pattern=r"^/api/v2/architecture/applicationVersions/\{applicationVersionId\}/asyncApi$", mcp_type=MCPType.TOOL),
-            RouteMap(pattern=r"^/api/v2/architecture/events(/\{id\})?$", mcp_type=MCPType.TOOL),
-            RouteMap(pattern=r"^/api/v2/architecture/eventVersions(/\{id\})?$", mcp_type=MCPType.TOOL),
-            RouteMap(pattern=r"^/api/v2/architecture/schemaVersions(/\{id\})?$", mcp_type=MCPType.TOOL),
-            RouteMap(pattern=r"^/api/v2/architecture/schemas(/\{id\})?$", mcp_type=MCPType.TOOL),
-            RouteMap(mcp_type=MCPType.EXCLUDE)
-        ],
+        route_maps=ROUTE_MAPS,
         mcp_component_fn=customize_components,
     )
 
